@@ -3,10 +3,7 @@ import tempfile
 import os
 
 # Import Rag classes.
-import retriever
-
-def generate_response(prompt: str):
-  return "This is some random string."
+from rag import Rag
 
 #Display all messages stored in session_state
 def display_messages():
@@ -24,7 +21,7 @@ def process_file():
 
     #feed the file to the vector storage.
     with st.session_state["feeder_spinner"], st.spinner("Uploading the file"):
-      retriever.feed(file_path)
+      st.session_state["assistant"].feed(file_path)
     os.remove(file_path)
 
 def process_input():
@@ -36,7 +33,7 @@ def process_input():
     st.session_state.messages.append({"role": "user", "content": prompt})
 
     # Generate response and write back to the chat container.
-    response = generate_response(prompt)
+    response = st.session_state["assistant"].retrieve(prompt)
     with st.chat_message("assistant"):
       st.markdown(response)
     st.session_state.messages.append({"role": "assistant", "content": response})
@@ -44,8 +41,9 @@ def process_input():
 def main():
   st.title("DocueMentor")
 
-  # Initialize the session_state messages.
-  if "messages" not in st.session_state:
+  # Initialize the session_state.
+  if len(st.session_state) == 0:
+    st.session_state["assistant"] = Rag()
     st.session_state.messages = []
 
   # Code for file upload functionality.
