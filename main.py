@@ -12,6 +12,9 @@ def display_messages():
       st.markdown(message['content'])
 
 def process_file():
+  st.session_state["assistant"].clear()
+  st.session_state.messages = []
+
   for file in st.session_state["file_uploader"]:
     # Store the file at tem location
     # of your system to feed to our vector storage.
@@ -33,7 +36,7 @@ def process_input():
     st.session_state.messages.append({"role": "user", "content": prompt})
 
     # Generate response and write back to the chat container.
-    response = st.session_state["assistant"].retrieve(prompt)
+    response = st.session_state["assistant"].ask(prompt)
     with st.chat_message("assistant"):
       st.markdown(response)
     st.session_state.messages.append({"role": "assistant", "content": response})
